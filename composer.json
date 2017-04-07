@@ -1,6 +1,7 @@
 {
     "name": "rivsens/hello-php",
     "description": "demo",
+"license": "MIT",
     "":[
 {
 	"name":"demo",
