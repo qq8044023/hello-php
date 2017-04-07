@@ -1,0 +1,9 @@
+参考地址:
+https://rivsen.github.io/post/how-to-publish-package-to-packagist-using-github-and-composer-step-by-step
+
+
+
+以上完成后
+1.composer require rivsen/hello-world dev-master
+
+

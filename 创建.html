@@ -1,0 +1,441 @@
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>使用GitHub、Composer、Packagist管理公开的PHP包（Step By Step）</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=0">
+        <meta name="description" content="Rivsen的博客，喜欢折腾，喜欢php，对symfony和silex框架感兴趣 This theme sourced on Github - https://github.com/gayanvirajith/harmony
+">
+        <link rel="canonical" 
+        href="https://rivsen.github.io/post/how-to-publish-package-to-packagist-using-github-and-composer-step-by-step">
+        
+        <!-- Harmony styles -->
+        <link rel="stylesheet" type="text/css" href="/assets/css/main.css">
+
+        <!-- Modernizr js -->
+        <script async src="/assets/js/modernizr.js"></script>    
+
+        <!-- IE Fixes -->
+        <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+        <!--[if lt IE 9]>
+          <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+          <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+        <![endif]-->        
+    </head>
+    <body class="theme-base-01">
+        <header class="main-header">
+            <div class="wc-container">
+                <h1><a href="/">Rivsen's Blog</a></h1>
+                <h2>这里是我的博客，使用github pages创建。</h2>
+                <ul>
+	<li>
+		<a href="https://rivsen.github.io/about">关于我</a><span>/</span>
+	</li>
+	<li>
+		<a href="https://rivsen.github.io/blog">博客</a><span>/</span>
+	</li>
+	
+	<li>
+		<a title="Rivsen on Github" 
+			href="https://github.com/Rivsen/rivsen.github.io" target="_blank">
+      GitHub
+		</a><span>/</span>
+	</li>
+	
+</ul>
+                
+            </div>
+        </header>
+        <div class="page-content wc-container">
+	
+	<div class="post">
+		<h1>使用GitHub、Composer、Packagist管理公开的PHP包（Step By Step）</h1>
+		<p class="post-meta">
+      <span class="post-date">
+        <a href="https://rivsen.github.io">Rivsen Tan</a>
+	    </span> |
+
+			
+      <span class="categories">
+      blog, composer, php, github, and packagist
+      </span> |
+	    
+
+	    <span class="post-date">
+    	2015-3-15 
+	    </span>
+		</p>		
+		<div class="post">
+			<h2 id="什么是github">什么是Github</h2>
+<p><a href="https://github.com/">GitHub</a>是一个用于使用Git版本控制系统项目的共享虚拟主机服务，可以免费托管公开的源代码仓库。在继续阅读之前请先确认是否已经有注册的GitHub帐号，因为GitHub官方提供Packagist的钩子服务。如果对Git还是有所陌生，推荐阅读 Progit（<a href="https://git-scm.com/book/zh/v2">online</a>/<a href="https://progit2.s3.amazonaws.com/zh/2015-02-26-6c188/progit-zh.355.pdf">pdf</a>）前七章。</p>
+
+<p><img src="/uploads/2015/0314/GitHub.png" alt="GitHub 截图" /></p>
+
+<h2 id="什么是composer">什么是Composer</h2>
+<p><a href="https://getcomposer.org/">Composer</a>是PHP中的一个依赖管理工具， 它可以让你声明自己项目所依赖的库，然后它将会在项目中为你安装这些库。安装步骤可以到官网阅读<a href="https://getcomposer.org/doc/00-intro.md">Getting Started</a>。在继续阅读之前，请确认composer已经安装并且可以使用。命令别名是<code class="highlighter-rouge">composer</code>，所以后续的所有如<code class="highlighter-rouge">composer xxx</code>均代表是执行composer命令。</p>
+
+<p><img src="/uploads/2015/0314/Composer.png" alt="Composer 截图" /></p>
+
+<p><img src="/uploads/2015/0314/Composer-run.png" alt="Composer 命令" /></p>
+
+<h2 id="什么是packagist">什么是Packagist</h2>
+<p><a href="https://packagist.org/">Packagist</a>主要提供Composer包发布和索引，默认Composer从Packagist获取资源。在继续阅读之前，请使用你的GitHub帐号登录Packagist。</p>
+
+<p><img src="/uploads/2015/0314/Packagist.png" alt="Packagist 截图" /></p>
+
+<h2 id="发布流程">发布流程</h2>
+<p>前面我们已经准备好了GitHub帐号、Composer程序、Packagist帐号，接下来是如何通过它们发布我们的Composer包。</p>
+
+<h3 id="1-创建github仓库">1. 创建GitHub仓库</h3>
+<p>打开Github主页，点击右上角创建仓库，比如取名叫做hello-world。
+<img src="/uploads/2015/0314/github-01.png" alt="创建仓库01" />
+<img src="/uploads/2015/0314/github-02.png" alt="创建仓库02" />
+默认仓库是空的，没有任何代码和分支（git空仓库的特性），用<code class="highlighter-rouge">git clone xxx</code>克隆到本地。</p>
+
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span><span class="nb">cd</span> ~/work/github/
+<span class="gp">$ </span>git clone git@github.com:Rivsen/hello-world.git
+</code></pre>
+</div>
+
+<h3 id="2-初始化-composerjson">2. 初始化 composer.json</h3>
+
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span><span class="nb">cd</span> ~/work/github/hello-world/
+<span class="gp">$ </span>composer init
+</code></pre>
+</div>
+
+<p>使用composer自带的初始化命令，创建一个composer.json描述文件。如果想手动编辑，可以去composer官网阅读<a href="https://getcomposer.org/doc/04-schema.md">相关文档</a>获得帮助。
+<img src="/uploads/2015/0314/composer-01.png" alt="初始化composer01" />
+<img src="/uploads/2015/0314/composer-02.png" alt="初始化composer02" />
+<img src="/uploads/2015/0314/composer-03.png" alt="初始化composer03" /></p>
+
+<p>再来添加一个readme，要不然打开github仓库主页的时候，总会提示让你创建一个readme，有readme其实对其他小伙伴能快速了解这个包的功能有很大作用。</p>
+
+<div class="language-text highlighter-rouge"><pre class="highlight"><code># Hello World Package for PHP Composer #
+
+This is a hello world package for php composer beginners tutorial.
+</code></pre>
+</div>
+
+<h3 id="3-推送代码">3. 推送代码</h3>
+
+<p>到此为止我们已经完成了仓库的初始化：初始化composer描述文件，编写readme文档，接下来需要把代码推送到GitHub。</p>
+
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>git add ./
+<span class="gp">$ </span>git commit -m <span class="s1">'init hello world package'</span>
+<span class="gp">$ </span>git push origin master
+</code></pre>
+</div>
+
+<p>最后一步需要加<code class="highlighter-rouge">origin master</code>参数的原因是空仓库是没有分支的，所以我们需要强制推送本地的master到远端的master，在这之后可以直接用<code class="highlighter-rouge">git push</code>命令推送而不需要加后面的参数了。</p>
+
+<p><img src="/uploads/2015/0314/github-03.png" alt="推送到GitHub" /></p>
+
+<h3 id="4-发布到packagistorg">4. 发布到packagist.org</h3>
+
+<p>访问Packagist主页，确认自己已经登录，然后点击右上角大大的<code class="highlighter-rouge">Submit Package</code>，然后填入我们创建的仓库的地址，点击Check，然后没问题，再点击Submit。</p>
+
+<p><img src="/uploads/2015/0314/packagist-01.png" alt="发布到Packagist01" />
+<img src="/uploads/2015/0314/packagist-02.png" alt="发布到Packagist02" /></p>
+
+<p>这个时候我们的包已经可以提供给小伙伴们安装啦！恭喜！撒花！</p>
+
+<p>那么世界上一般事情都不会这么顺利，尤其是，其实我们前面也没做什么的情况下。</p>
+
+<p>提交之后，会自动跳转到我们发布的hello-world包的详情页面，可以看到上面有红红的一行警告，仔细阅读它。</p>
+
+<p>所以我们知道了，还需要去配置GitHub和Packagist之间的自动更新钩子，根据向导，复制自己的packagist的api token，然后去GitHub配置好仓库的钩子服务，然后点击服务名称后面的笔图标，进去之后点Test service。如果services列表里的packagist前面是绿色的对钩，说明成功啦第一步啦！</p>
+
+<p>接着我们再去packagist的hello-world包详情页面刷新，红红的警告没有啦！（如果这里还有，那么说明在GitHub创建的service填写的资料有错误，第一个是username，不是email地址，第二个是packagist api token，一定不要搞错，第三个不需要填）。</p>
+
+<h3 id="5-测试安装hello-world包">5. 测试安装hello-world包</h3>
+
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span><span class="nb">cd</span> ~/work/github/test
+<span class="gp">$ </span>composer require rivsen/hello-world dev-master
+</code></pre>
+</div>
+
+<p>查看下test目录里，是不是已经有了我们的hello-world包了～</p>
+
+<p>到这里我们竟然一行PHP都没写呢！</p>
+
+<h3 id="6-添加示例代码">6. 添加示例代码</h3>
+
+<p>接下来终于到可以写PHP啦！</p>
+
+<p>首先编辑我们hello-world包仓库代码里的<code class="highlighter-rouge">composer.json</code>(别改成test里面的了哈)，加入autoload配置。</p>
+
+<div class="language-json highlighter-rouge"><pre class="highlight"><code><span class="p">{</span><span class="w">
+    </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"rivsen/hello-world"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"description"</span><span class="p">:</span><span class="w"> </span><span class="s2">"this is a hello world repo for composer."</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"license"</span><span class="p">:</span><span class="w"> </span><span class="s2">"MIT"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"authors"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+        </span><span class="p">{</span><span class="w">
+            </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Rivsen Tan"</span><span class="p">,</span><span class="w">
+            </span><span class="nt">"email"</span><span class="p">:</span><span class="w"> </span><span class="s2">"rivsen1003@gmail.com"</span><span class="w">
+        </span><span class="p">}</span><span class="w">
+    </span><span class="p">],</span><span class="w">
+    </span><span class="nt">"autoload"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="nt">"psr-4"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"Rivsen\\Demo\\"</span><span class="p">:</span><span class="w"> </span><span class="s2">"src"</span><span class="w"> </span><span class="p">}</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="nt">"require"</span><span class="p">:</span><span class="w"> </span><span class="p">{}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+</div>
+
+<p>这里我们添加了autoload属性，并且是什么<code class="highlighter-rouge">psr-4</code>，这里我需要说一下，PSR-X是php-fig发布的一系列规范中的一个自动加载规范，如果想要深入了解它的其他规则，请阅读<a href="http://www.php-fig.org/">PHP-FIG</a>。添加的配置代表我们定义了一个命名空间的起始目录，比如src目录里有一个Hello类文件(类名必须和文件名一致)，那么要想通过autoload访问它，必须把命名空间写成<code class="highlighter-rouge">namespace Rivsen\Demo;</code>。</p>
+
+<p>那么我们去创建它吧！</p>
+
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span><span class="nb">cd</span> ~/work/github/hello-world/
+<span class="gp">$ </span>mkdir src
+<span class="gp">$ </span><span class="nb">cd </span>src/
+<span class="gp">$ </span>touch Hello.php
+</code></pre>
+</div>
+
+<div class="language-php highlighter-rouge"><pre class="highlight"><code><span class="cp">&lt;?php</span>
+<span class="k">namespace</span> <span class="nx">Rivsen\Demo</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">Hello</span>
+<span class="p">{</span>
+    <span class="k">private</span> <span class="nv">$name</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">(</span> <span class="nv">$name</span> <span class="o">=</span> <span class="s1">'World'</span> <span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">name</span> <span class="o">=</span> <span class="nv">$name</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">getName</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">name</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">hello</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="s1">'Hello '</span><span class="o">.</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">name</span><span class="o">.</span><span class="s1">'!'</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+<p>在提交代码之前，我们需要自己先测试一遍我们的代码是否有问题。</p>
+
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span><span class="nb">cd</span> ~/work/github/hello-world
+<span class="gp">$ </span>composer install
+</code></pre>
+</div>
+
+<p>然后创建一个测试php文件，引入autoload，并且实例化一个我们的Hello类。</p>
+
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>touch test.php
+</code></pre>
+</div>
+
+<div class="language-php highlighter-rouge"><pre class="highlight"><code><span class="cp">&lt;?php</span>
+<span class="k">require_once</span> <span class="s2">"vendor/autoload.php"</span><span class="p">;</span>
+
+<span class="nv">$hello</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Rivsen\Demo\Hello</span><span class="p">();</span>
+<span class="k">echo</span> <span class="nv">$hello</span><span class="o">-&gt;</span><span class="na">hello</span><span class="p">();</span>
+
+<span class="k">echo</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="p">;</span>
+<span class="nv">$hiGirl</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Rivsen\Demo\Hello</span><span class="p">(</span><span class="s1">'My Goddess'</span><span class="p">);</span>
+<span class="k">echo</span> <span class="nv">$hiGirl</span><span class="o">-&gt;</span><span class="na">hello</span><span class="p">();</span>
+</code></pre>
+</div>
+
+<p>OK，能看到你和你的女神打招呼就说明<del>女神光环加持</del>成功啦！</p>
+
+<p>然后需要推送这些新代码到GitHub，因为我们配置了钩子服务，所以在推送之后不久，GitHub会通知Packagist仓库有更新，然后小伙伴们就轻松的拿到你的更新的代码啦！</p>
+
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>git add .
+<span class="gp">$ </span>git commit -m <span class="s1">'upload test script for Hello class'</span>
+<span class="gp">$ </span>git push
+</code></pre>
+</div>
+
+<h2 id="包版本管理">包版本管理</h2>
+
+<p>至此我们已经可以把自己的代码发布到线上了，但是有一个问题，别人的包都有版本号，而我们的安装需要手动指定<code class="highlighter-rouge">dev-master</code>要不然composer会说找不到stable版本，这里我们就需要引入版本和分支概念了，composer包的版本是来自于git的分支和tag，分支代表dev版本(除master外)，tag代表stable版本，因为正常来说，大家都是这样管理项目的版本的，所以直接无痛模式切换，自由方便。下面我们就来模拟一下如何发布轻量级的版本（相对使用私钥签署tag并发布的过程）。</p>
+
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span><span class="nb">cd</span> ~/work/github/hello-world
+<span class="gp">$ </span>git branch
+</code></pre>
+</div>
+
+<p>我们会看到绿色的master前面有个星号，说明当前工作分支是master，那么对应的composer包的版本就是dev-master，是不是有些熟悉了。接下来我们创建一个0.1分支，作为我们0.1版本的迭代分支，并基于它提交一些代码，然后推送。</p>
+
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>git checkout -b 0.1
+</code></pre>
+</div>
+
+<p>比如我们编辑readme，添加使用示例（虽然我们在0.1分支开发和提交，但是我们一定要在特性或者bug修复的工作完成之后，合并回master）。</p>
+
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>git add .
+<span class="gp">$ </span>git commit -m <span class="s1">'update readme, add Hello class demo'</span>
+<span class="gp">$ </span>git push origin 0.1
+</code></pre>
+</div>
+
+<p>因为我们创建的0.1分支在远端是不存在的，所以要指定推送到远端的0.1，GitHub会自动创建一个0.1分支，和master是一样的。这个时候我们再看看我们的hello-world包的版本，使用<code class="highlighter-rouge">composer show rivsen/hello-world</code>命令查看。</p>
+
+<div class="language-text highlighter-rouge"><pre class="highlight"><code>name     : rivsen/hello-world
+descrip. : this is a hello world repo for composer.
+keywords : 
+versions : dev-master, 0.1.x-dev
+type     : library
+...
+</code></pre>
+</div>
+
+<p>但是只有dev是不够的，很多线上的版本依赖的都是stable，肯定不会让一个dev包上去的，这个时候，我们觉得可以发布一个稳定版本了，那么在0.1分支上，我们发布一个0.1.0版本。</p>
+
+<div class="language-bash highlighter-rouge"><pre class="highlight"><code><span class="gp">$ </span>git tag 0.1.0
+<span class="gp">$ </span>git push --tags
+</code></pre>
+</div>
+
+<p>推送成功之后，用composer命令查看一下版本信息，是不是有了一个0.1.0的stable版本了呢！到此为止，基本的发布流程就讲完啦！</p>
+
+<p>有什么意见或建议，可以创建一个<a href="https://github.com/Rivsen/hello-world/issues/new">issue</a>给我，我会及时回复的！</p>
+
+<p>hello-world 包资源地址： https://github.com/Rivsen/hello-world
+composer 包名称： rivsen/hello-world</p>
+
+		</div>
+	</div>
+
+
+	
+	<div class="related">
+		<h4>Related Posts</h2>
+		<ul class="posts">
+		    
+		    <li>
+			  <span>20 Jan 2017 &raquo;</span>
+			  <a href="https://rivsen.github.io/post/generate-N-columns-name-like-excel">用代码生成Excel中N列的列名</a>
+		    </li>
+		    
+		    <li>
+			  <span>28 Mar 2015 &raquo;</span>
+			  <a href="https://rivsen.github.io/post/embed-silex-in-another-silex">把silex嵌入到另一个silex中</a>
+		    </li>
+		    
+		    <li>
+			  <span>14 Mar 2015 &raquo;</span>
+			  <a href="https://rivsen.github.io/blog/2015/03/14/Hello-World/">Hello World!</a>
+		    </li>
+		    
+		</ul>
+	</div>
+	
+
+	<div class="post-footer">
+		<div class="column-1">
+			
+				<a href="https://rivsen.github.io/blog/2015/03/14/Hello-World/"><< Older</a>
+			
+		</div>
+		<div class="column-2"><a href="https://rivsen.github.io/ ">Home</a></div>
+		<div class="column-3">
+			
+				<a href="https://rivsen.github.io/post/embed-silex-in-another-silex">Newer >></a>
+			
+		</div>
+	</div>
+
+  <div class="post-disqus">
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+    /* * * CONFIGURATION VARIABLES * * */
+    var disqus_shortname = 'rivsen-github';
+    var disqus_identifier = 'how-to-publish-package-to-packagist-using-github-and-composer-step-by-step';
+    var disqus_title = '使用GitHub、Composer、Packagist管理公开的PHP包（Step By Step）';
+    var disqus_url = 'https://rivsen.github.io/post/how-to-publish-package-to-packagist-using-github-and-composer-step-by-step';
+
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+     var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+     dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+     (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+     })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+  </div>
+</div>
+ 
+
+        <footer class="main-footer">
+            <div class="wc-container">
+                <div class="column one">
+                    <h6>Few more links</h6>
+<ul class="menu">
+    <li><a href="https://rivsen.github.io/about">关于我</a></li>
+    <li><a href="https://rivsen.github.io/blog">博客</a></li>
+    <li><a href="https://rivsen.github.io/faq">FAQ</a></li>    
+</ul>		
+                    
+                </div>
+                <div class="column two">
+                    <h6>Follow me</h6>
+
+<ul class="social-media">
+
+
+    
+
+    
+    <li>
+        <a title="Rivsen on Github" 
+            href="https://github.com/Rivsen" 
+            class="github wc-img-replace" target="_blank">Github</a>
+    </li>
+     
+
+    
+
+    
+    <li>
+        <a title="+Rivsen on Google Plus" 
+            href="https://plus.google.com/+Rivsen" 
+            class="google wc-img-replace" target="_blank">Google</a>
+    </li>
+    
+
+    
+
+    
+
+</ul>
+                </div>
+            </div>
+            <p class="wc-container disclaimer">
+                
+  <a href="http://creativecommons.org/licenses/by/3.0/"><img style="" src="https://i.creativecommons.org/l/by/3.0/80x15.png" alt="Creative Commons License" id="licensebutton_slim"></a>
+	Everything you find here under Creative Commons Attribution 3.0.
+  <br />
+
+Powered by <a href="http://jekyllrb.com" target="_blank">Jekyll</a>
+
+            </p>
+        </footer>
+        <script type="text/javascript">
+          /* To avoid render blocking css */
+          var cb = function() {
+          };
+          var raf = requestAnimationFrame || mozRequestAnimationFrame ||
+              webkitRequestAnimationFrame || msRequestAnimationFrame;
+          if (raf) raf(cb);
+          else window.addEventListener('load', cb);
+        </script>
+        <!-- jQuery -->
+        <script src="/assets/js/jquery.min.js"></script>
+        <!-- Site js -->
+        <script src="/assets/js/all.js"></script>
+        <!-- Google analytics  -->
+        
+    </body>        
+</html>
