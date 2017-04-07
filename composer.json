@@ -1,0 +1,11 @@
+{
+    "name": "hellophp/hello-php",
+    "description": "demo",
+    "":[
+{
+	"name":"demo",
+	"email":"8044023@qq.com"
+}	
+],
+    "require": {}
+}
