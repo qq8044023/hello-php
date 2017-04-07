@@ -7,3 +7,6 @@ https://rivsen.github.io/post/how-to-publish-package-to-packagist-using-github-a
 1.composer require rivsen/hello-world dev-master
 
 
+2.composer install
+
+
